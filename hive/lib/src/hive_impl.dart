@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:collection';
+import 'dart:developer' as developer;
 import 'dart:math';
 import 'dart:typed_data';
 
@@ -7,6 +8,7 @@ import 'package:hive_ce/hive.dart';
 import 'package:hive_ce/src/adapters/big_int_adapter.dart';
 import 'package:hive_ce/src/adapters/date_time_adapter.dart';
 import 'package:hive_ce/src/adapters/duration_adapter.dart';
+import 'package:hive_ce/src/backend/storage_backend.dart';
 import 'package:hive_ce/src/backend/storage_backend_memory.dart';
 import 'package:hive_ce/src/box/box_base_impl.dart';
 import 'package:hive_ce/src/box/box_impl.dart';
@@ -17,12 +19,11 @@ import 'package:hive_ce/src/registry/type_registry_impl.dart';
 import 'package:hive_ce/src/util/extensions.dart';
 import 'package:meta/meta.dart';
 
-import 'package:hive_ce/src/backend/storage_backend.dart';
+part 'hive_ce_devtools_extension.dart';
 
 /// Not part of public API
 class HiveImpl extends TypeRegistryImpl implements HiveInterface {
-  static final BackendManagerInterface _defaultBackendManager =
-      BackendManager.select();
+  static final BackendManagerInterface _defaultBackendManager = BackendManager.select();
 
   final _boxes = HashMap<String, BoxBaseImpl>();
   final _openingBoxes = HashMap<String, Future>();
@@ -40,8 +41,7 @@ class HiveImpl extends TypeRegistryImpl implements HiveInterface {
 
   /// either returns the preferred [BackendManagerInterface] or the
   /// platform default fallback
-  BackendManagerInterface get _manager =>
-      _managerOverride ?? _defaultBackendManager;
+  BackendManagerInterface get _manager => _managerOverride ?? _defaultBackendManager;
 
   void _registerDefaultAdapters() {
     registerAdapter(DateTimeWithTimezoneAdapter(), internal: true);
@@ -53,8 +53,7 @@ class HiveImpl extends TypeRegistryImpl implements HiveInterface {
   @override
   void init(
     String? path, {
-    HiveStorageBackendPreference backendPreference =
-        HiveStorageBackendPreference.native,
+    HiveStorageBackendPreference backendPreference = HiveStorageBackendPreference.native,
   }) {
     homePath = path;
     _managerOverride = BackendManager.select(backendPreference);
@@ -194,9 +193,7 @@ class HiveImpl extends TypeRegistryImpl implements HiveInterface {
       if ((lazy == null || box.lazy == lazy) && box.valueType == E) {
         return box as BoxBase<E>;
       } else {
-        final typeName = box is LazyBox
-            ? 'LazyBox<${box.valueType}>'
-            : 'Box<${box.valueType}>';
+        final typeName = box is LazyBox ? 'LazyBox<${box.valueType}>' : 'Box<${box.valueType}>';
         throw HiveError('The box "$lowerCaseName" is already open '
             'and of type $typeName.');
       }
@@ -215,8 +212,7 @@ class HiveImpl extends TypeRegistryImpl implements HiveInterface {
   Box<E> box<E>(String name) => _getBoxInternal<E>(name, false) as Box<E>;
 
   @override
-  LazyBox<E> lazyBox<E>(String name) =>
-      _getBoxInternal<E>(name, true) as LazyBox<E>;
+  LazyBox<E> lazyBox<E>(String name) => _getBoxInternal<E>(name, true) as LazyBox<E>;
 
   @override
   bool isBoxOpen(String name) {
