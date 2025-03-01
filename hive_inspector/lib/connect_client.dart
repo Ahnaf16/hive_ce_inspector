@@ -12,6 +12,7 @@ class ConnectClient {
   final EvalOnDartLibrary eval;
 
   Disposable? _allBoxNamesDisposable;
+  Disposable? _boxDataDisposable;
 
   static ConnectClient connect() {
     final service = serviceManager.service!;
@@ -35,6 +36,19 @@ class ConnectClient {
       method: 'boxNames()',
       eventKind: 'boxNames',
       isAlive: _allBoxNamesDisposable,
+    );
+
+    return List<String>.from(data['boxNames'] ?? []);
+  }
+
+  Future<List<String>> fetchBoxData(String boxName) async {
+    _boxDataDisposable?.dispose();
+    _boxDataDisposable = Disposable();
+
+    final Map<String, dynamic> data = await _evalMethod(
+      method: 'requestBoxData($boxName)',
+      eventKind: 'boxData',
+      isAlive: _boxDataDisposable,
     );
 
     return List<String>.from(data['boxNames'] ?? []);

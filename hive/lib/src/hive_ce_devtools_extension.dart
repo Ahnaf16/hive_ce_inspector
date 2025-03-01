@@ -23,14 +23,23 @@ class HiveDevToolsExtension {
 
   final PostEvent _postEvent;
 
-  /// Requests all legacy and async keys and post an event with the result.
+  /// Requests all box names and post an event with the result.
   Future<void> boxNames() async {
-    final boxNames = (Hive as HiveImpl)._boxes.keys.toList();
-    print('$boxNames');
+    final boxNames = (Hive as HiveImpl)._boxes.values.map((e) => e.name).toList();
 
     _postEvent(
       '${_eventPrefix}boxNames',
       {'boxNames': boxNames},
+    );
+  }
+
+  /// Requests a box data and post an event with the result.
+  Future<void> requestBoxData(String boxName) async {
+    final data = Hive.box(boxName).toMap();
+
+    _postEvent(
+      '${_eventPrefix}boxData',
+      {'boxData': data},
     );
   }
 }
